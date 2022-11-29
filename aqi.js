@@ -17,7 +17,7 @@ function dateMath(i=0,type){
     month.length < 2 ? '0'+ month : month;
     if (type === 1){
         return `${year}-${month}-${day}`;
-    } else {
+    } else if (type === 0){
         return `${year}${month}${day}`;
     };
 
