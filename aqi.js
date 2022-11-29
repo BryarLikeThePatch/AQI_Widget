@@ -1,22 +1,29 @@
 const key = "ochrefox93";
 const email = "BryTop05@gmail.com";
 const state = 49;
-const county = '049';
+const county = '035';
 const site = '4001';
-const paramClass = 'AQI POLLUTANTS';
-const begDate = dateMath(-4);
-const endDate = dateMath(-1);
-const param = '44201'
+const paramClass = 'AIRNOW MAPS';
+const begDate = dateMath(-7,0);
+const endDate = dateMath(0,0);
+const param = '42101'
 console.log(begDate);
 
-function dateMath(i=0){
+function dateMath(i=0,type){
     const d = new Date()
     const day = d.getDate() + i;
     const month = (d.getMonth()+1).toString();
     const year = d.getFullYear();
     month.length < 2 ? '0'+ month : month;
-    return `${year}${month}${day}`;
+    if (type === 1){
+        return `${year}-${month}-${day}`;
+    } else {
+        return `${year}${month}${day}`;
+    };
+
 };
+
+
 var counter = 0;
 function newTbl(data){
     const div1 = document.querySelector("#div1")
@@ -128,7 +135,11 @@ const pClassNumURL = (e,k,p) => {
 //here it is. The thing I've been working to achieve this entire time. 
 const testSiteURL = (email,key,param,begDate,endDate,state,county,site) => {
     return `https://aqs.epa.gov/data/api/dailyData/bySite?email=${email}&key=${key}&param=${param}&bdate=${begDate}&edate=${endDate}&state=${state}&county=${county}&site=${site}`
-}
+};
+
+const testCountyURL = (email,key,param,begDate,endDate,state,county,site) => {
+    return `https://aqs.epa.gov/data/api/dailyData/byCounty?email=${email}&key=${key}&param=${param}&bdate=${begDate}&edate=${endDate}&state=${state}&county=${county}`;
+};
 
 async function whatsTheAQIofThisBongRip(url){
     const data = await fetch(url)
@@ -225,12 +236,37 @@ const limits = [
 ]
 
 // fetchListData(stateURL(email,key));
-fetchListData(countyURL(email,key,state));
-fetchListData(siteURL(email,key,state,county));
+// fetchListData(countyURL(email,key,state));
+// fetchListData(siteURL(email,key,state,county));
 // fetchListData(paramClassURL(email,key));
-// fetchListData(pClassNum(email,key,paramClass));
+fetchListData(pClassNumURL(email,key,paramClass));
 
-const aqi = whatsTheAQIofThisBongRip(testSiteURL(email,key,param,begDate,endDate,state,county,site));
+// const aqi = whatsTheAQIofThisBongRip(testCountyURL(email,key,param,begDate,endDate,state,county,site));
+// const aqi2 = whatsTheAQIofThisBongRip(testSiteURL(email,key,param,begDate,endDate,state,county,site));
 
 
+//===================================================================================================================================
+//going to try the airnow API to see if it treats me better. 
 
+const airNowKey = '9ADB2815-ADDF-47A9-BD19-0DA03F3E3D1C';
+var data = []
+const zCodes = ['84044','84101','84102','84103','84104','84105','84106','84108','84109','84111']
+const pullDate = dateMath(0,1);
+const urlBuilder = (z,dt,ds = 25,k) => {
+    return `https://airnowapi.org/aq/forecast/zipCode/?format=application/json&zipCode=${z}&date=${dt}&distance=${ds}&API_KEY=${k}`;
+};
+
+async function airNow(url){
+    const data = await fetch(url)
+        .then((resp) => {
+            console.log(resp);
+            return resp.json();
+        })
+        .then((data) => {
+            console.log(data);
+            return data.Data;
+        });
+    return data;
+};
+
+const aNdata = airNow(urlBuilder(zCodes[0],pullDate,25,airNowKey));
