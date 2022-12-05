@@ -7,3 +7,8 @@
     border: 2px solid;
     border-color: black;
 };
+
+body {
+    background-color: rgba(169, 169, 169, 0.356);
+};
+

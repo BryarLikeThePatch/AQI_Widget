@@ -7,7 +7,6 @@ const paramClass = 'AIRNOW MAPS';
 const begDate = dateMath(-7,0);
 const endDate = dateMath(0,0);
 const param = '42101'
-console.log(begDate);
 
 function dateMath(i=0,type){
     const d = new Date()
@@ -25,9 +24,10 @@ function dateMath(i=0,type){
 
 
 var counter = 0;
+
 function newTbl(data){
     const div1 = document.querySelector("#div1")
-    let tblHdrs = ['Code','State'];
+    let tblHdrs = ['Parameter','AQI'];
     
     // while (div1.firstChild) div1.removeChild(div1.firstChild); //removes any data under the div;
 
@@ -239,7 +239,7 @@ const limits = [
 // fetchListData(countyURL(email,key,state));
 // fetchListData(siteURL(email,key,state,county));
 // fetchListData(paramClassURL(email,key));
-fetchListData(pClassNumURL(email,key,paramClass));
+// fetchListData(pClassNumURL(email,key,paramClass));
 
 // const aqi = whatsTheAQIofThisBongRip(testCountyURL(email,key,param,begDate,endDate,state,county,site));
 // const aqi2 = whatsTheAQIofThisBongRip(testSiteURL(email,key,param,begDate,endDate,state,county,site));
@@ -252,8 +252,9 @@ const airNowKey = '9ADB2815-ADDF-47A9-BD19-0DA03F3E3D1C';
 var data = []
 const zCodes = ['84044','84101','84102','84103','84104','84105','84106','84108','84109','84111']
 const pullDate = dateMath(0,1);
+
 const urlBuilder = (z,dt,ds = 25,k) => {
-    return `https://airnowapi.org/aq/forecast/zipCode/?format=application/json&zipCode=${z}&date=${dt}&distance=${ds}&API_KEY=${k}`;
+    return `https://airnowapi.org/aq/observation/zipCode/current/?format=application/json&zipCode=${z}&date=${dt}&distance=${ds}&API_KEY=${k}`;
 };
 
 async function airNow(url){
@@ -263,10 +264,33 @@ async function airNow(url){
             return resp.json();
         })
         .then((data) => {
-            console.log(data);
-            return data.Data;
+            return data;
         });
+    console.log(data);
     return data;
 };
 
-const aNdata = airNow(urlBuilder(zCodes[0],pullDate,25,airNowKey));
+
+async function summary(){
+    const aNdata = await airNow(urlBuilder(zCodes[0],pullDate,25,airNowKey))
+        .then((data) => {
+            const rtnArr = [];
+            for (let ob of data){
+                const {ParameterName,AQI} = ob;
+                rtnArr.push({param:ParameterName,aqi: AQI});
+            };
+            let avgAQI = 0
+            for (let v of rtnArr){
+                avgAQI += v.aqi
+            }
+            avgAQI = Math.round(((avgAQI / rtnArr.length)+Number.EPSILON)*100)/100;
+            rtnArr.push({param: 'Overal Avg',aqi: avgAQI});
+            return rtnArr;
+        });
+    return aNdata;
+};
+
+async function master() {
+    const s = await summary()
+        .then((data) => newTbl(data));
+}
