@@ -1,5 +1,5 @@
-const key = "ochrefox93";
-const email = "BryTop05@gmail.com";
+const key = `${key1}`;
+const email = `${email}`;
 const state = 49;
 const county = '035';
 const site = '4001';
@@ -248,7 +248,7 @@ fetchListData(pClassNumURL(email,key,paramClass));
 //===================================================================================================================================
 //going to try the airnow API to see if it treats me better. 
 
-const airNowKey = '9ADB2815-ADDF-47A9-BD19-0DA03F3E3D1C';
+const airNowKey = `${airnowKey1}`
 var data = []
 const zCodes = ['84044','84101','84102','84103','84104','84105','84106','84108','84109','84111']
 const pullDate = dateMath(0,1);
